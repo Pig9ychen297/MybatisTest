@@ -1,0 +1,91 @@
+package com.piggy.test;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.junit.Test;
+
+import com.piggy.mapper.ordermapper.OrderMapper;
+import com.piggy.mapper.usermapper.UserMapper;
+import com.piggy.pojo.Order;
+import com.piggy.pojo.User;
+import com.piggy.util.MybatisUtil;
+
+public class MyTest {
+	@Test
+	public void test1(){
+		SqlSessionFactory factory = MybatisUtil.getFactory();
+		SqlSession session = factory.openSession();
+		
+		//通过读取UserMapper.xml，创建出UserMapper.java的代理实现类
+		UserMapper userMapper=session.getMapper(UserMapper.class);
+		
+		List<User> users=userMapper.selectAll();
+		for (User user : users) {
+			System.out.println(user.getName());
+		}
+		session.close();
+	}
+
+	@Test
+	public void test2(){
+//		创建会话工场
+		SqlSessionFactory factory = MybatisUtil.getFactory();
+	//创建SqlSession对象
+		SqlSession session = factory.openSession();
+//		通过SqlSession对象获得Mapper的代理实现类
+		OrderMapper om = session.getMapper(OrderMapper.class);
+//		实现类对象调用接口方法
+		List<Order> olist = om.selectzz();
+		for (Order order : olist) {
+			System.out.println(order);
+		}
+		//关闭资源
+		session.close();
+	}
+	@Test
+	public void test3(){
+		SqlSessionFactory factory = MybatisUtil.getFactory();
+		SqlSession session = factory.openSession();
+		OrderMapper om = session.getMapper(OrderMapper.class);
+		Map<String,Object> map = new HashMap<>();
+		map.put("create_time",new Date());
+		map.put("user_id", 5);
+		om.addOrder(map);
+		session.commit();
+		session.close();
+	}
+	@Test
+	public void testdelete(){
+		SqlSessionFactory factory = MybatisUtil.getFactory();
+		SqlSession session = factory.openSession();
+		UserMapper um = session.getMapper(UserMapper.class);
+		um.deleteById(12);
+		session.commit();
+		session.close();
+	}
+	@Test
+	public void update(){
+		Calendar calendar = new GregorianCalendar(1999,9,9,9,9,9);
+		Date date = calendar.getTime();
+		SqlSessionFactory factory  = MybatisUtil.getFactory();
+		SqlSession Session = factory.openSession();
+		UserMapper um = Session.getMapper(UserMapper.class);
+		User user = new User();
+		user.setName("陈永华");
+		user.setBirthday(new Date());
+		user.setTel("13066666621");
+		user.setRegister_time(date);
+		user.setId(3);
+		um.update(user);
+		Session.commit();
+		Session.close();
+	}
+	
+}
